@@ -6,32 +6,34 @@
 
 thread_local _simple_xcypher_errno simple_xcypher_errno = SIMPLE_XCYPHER_ERRNO_NONE;
 
-char __stdcall *simple_xcypher_errno_message (_simple_xcypher_errno errno){
-  switch (errno){
+char __stdcall *simple_xcypher_errno_message (_simple_xcypher_errno err){
+  switch (err){
     case SIMPLE_XCYPHER_ERRNO_NONE:
       return "None.";
     case SIMPLE_XCYPHER_ERRNO_INDEX_OUT_OF_RANGE: 
       return "Index out of range.";
     default:
-      return "Unknown errno given.";
+      return "Undefined errno.";
   }
 }
 
-size_t __stdcall simple_xcypher_calc_encrypted_data_size (size_t datasize){
+int __stdcall simple_xcypher_calc_encrypted_data_size (size_t datasize, size_t *encrypteddatasizep){
   if (0 < datasize){
-    size_t n = 1;
-    while (1){
-      if (datasize <= n){
-        break;
+    if (datasize <= (SIZE_MAX >> 1)){
+      for (size_t n = 1; n <= (SIZE_MAX >> 1); n = (n << 1) | 1){
+        if (datasize <= n){
+          *encrypteddatasizep = n + 1;
+          return 0;
+        }
       }
-      else {
-        n <<= 1;
-        n |= 1;
-      }
+      return 1; 
     }
-    return n;
+    else {
+      return 1;
+    }
   }
   else {
+    *encrypteddatasizep = 0;
     return 0;
   }
 }
@@ -44,7 +46,7 @@ static inline uint64_t xorlshift (uint64_t number){
 }
 
 static inline void calc_index_and_mask (size_t index, simple_xcypher_key key, size_t encrypteddatasize, size_t *indexp, uint8_t *maskp){
-  *indexp = (index ^ key) & encrypteddatasize;
+  *indexp = (index ^ key) & (encrypteddatasize -1);
   *maskp = xorlshift(index ^ key);
 }
 

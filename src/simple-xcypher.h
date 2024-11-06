@@ -35,21 +35,23 @@ extern thread_local _simple_xcypher_errno simple_xcypher_errno;
 
 /**
  * @brief simple_xcypher_errno の値をメッセージ表示に適した文字列に変換します。
- * @param errno simple_xcypher_errno に設定された値です。
- * @return errno の内容にあった静的な文字列を返します。
- * @note 未定義の値が errno に指定された場合、この関数は `"Unknown errno given."` を返します。
+ * @param err simple_xcypher_errno に設定された値です。
+ * @return err の内容にあった静的な文字列を返します。
+ * @note 未定義の値が err に指定された場合、この関数は `"Undefined errno."` を返します。
  */
 
-extern char __stdcall *simple_xcypher_errno_message (_simple_xcypher_errno errno);
+extern char __stdcall *simple_xcypher_errno_message (_simple_xcypher_errno err);
 
 /**
  * @brief 暗号化されたデータを保存する領域の大きさを求めます。
  * @param datasize 暗号化するデータの大きさです。
- * @return \f$datasize <= 2^n - 1\f$ の条件を満たす最小の非負整数を返します。
- * @note この関数は必ず成功します。
+ * @param encrypteddatasizep データを保存する領域の最適な大きさが書き込まれる size_t 型のポインタです。
+ * @return 成功ならば 0 失敗ならば 1 を返します。
+ * @note 関数が成功したならば `datasize < 2^n` の条件を満たす最小の整数値が encrypteddatasizep に書き込まれます。
+ * @warning datasize の値が `SIZE_MAX >> 1` 以内でなければ、この関数は失敗します。
  */
 
-extern size_t __stdcall simple_xcypher_calc_encrypted_data_size (size_t datasize);
+extern int __stdcall simple_xcypher_calc_encrypted_data_size (size_t datasize, size_t *encrypteddatasizep);
 
 /**
  * @brief 鍵を用いてデータを暗号化します。

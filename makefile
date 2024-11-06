@@ -14,7 +14,11 @@ clean:
 
 .PHONY: test
 test: all 
-	make -C test SIMPLE_PCYPHER_INCLUDE=$(CURDIR)/dist/include SIMPLE_PCYPHER_LIB=$(CURDIR)/dist/lib
+	make -C test SIMPLE_XCYPHER_INCLUDE=$(CURDIR)/dist/include SIMPLE_XCYPHER_LIB=$(CURDIR)/dist/lib
+
+.PHONY: test-bin 
+test-bin: all
+	make -C test test-bin SIMPLE_XCYPHER_BIN=$(CURDIR)/bin
 
 src/simple-xcypher.o: src/simple-xcypher.c src/simple-xcypher.h
 	$(GCC) $(CFLAGS) -c -o src/simple-xcypher.o src/simple-xcypher.c

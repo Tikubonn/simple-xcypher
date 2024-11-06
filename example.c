@@ -4,11 +4,12 @@
 #include <stdint.h>
 #include <simple-xcypher/simple-xcypher.h>
 
-#define PLAINTEXT "This is plaintext!"
+#define PLAINTEXT "Hello."
 
 int main (){
 
-  size_t encrypteddatasize = simple_xcypher_calc_encrypted_data_size(sizeof(PLAINTEXT));
+  size_t encrypteddatasize;
+  simple_xcypher_calc_encrypted_data_size(sizeof(PLAINTEXT), &encrypteddatasize);
 
   uint8_t encrypteddata[encrypteddatasize];
   simple_xcypher_encrypt(PLAINTEXT, sizeof(PLAINTEXT), 0x123, encrypteddata, encrypteddatasize);

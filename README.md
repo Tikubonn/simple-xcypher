@@ -11,7 +11,7 @@ simple-xcypher は排他的論理和を用いた転置式暗号を提供しま�
 
 * ブロック暗号です。
 * 共通鍵暗号方式を採用しています。
-* ブロックの大きさに `2^n - 1` の条件を満たす非負整数を用います。 
+* ブロックの大きさに `2^n` の非負整数を用います。
 * 部分的な復号が可能です(ランダムアクセス)。
 * 転置式暗号なので、所定の位置に必ず出現する文章があっても、そこを足掛かりに復号されてしまう危険性が低くなります。
 * コストの低い演算が使われているので、高速に動作します。
@@ -26,8 +26,8 @@ simple-xcypher は排他的論理和を用いた転置式暗号を提供しま�
 simple-xcypher の転置先の位置計算は単純明快です。
 
 ```
-任意の非負整数 A, K, i と A <= 2^n -1 の条件を満たす非負整数 B があるとする。
-i の取りうる値が i < A のとき i XOR K AND B から得られる値はそれぞれ重複しない。
+任意の非負整数 A, K, i と A < 2^n の条件を満たす最小の整数 B があるとする。
+i の取りうる値が i < A のとき i XOR K AND (B - 1) から得られる値はそれぞれ重複しない。
 ```
 
 ただし `K = 0` の場合には転置が行われないので `0 < K` を満たすように `K` の値を設定する必要があります。
@@ -44,11 +44,12 @@ i の取りうる値が i < A のとき i XOR K AND B から得られる値は�
 #include <stdint.h>
 #include <simple-xcypher/simple-xcypher.h>
 
-#define PLAINTEXT "This is plaintext!"
+#define PLAINTEXT "Hello."
 
 int main (){
 
-  size_t encrypteddatasize = simple_xcypher_calc_encrypted_data_size(sizeof(PLAINTEXT));
+  size_t encrypteddatasize;
+  simple_xcypher_calc_encrypted_data_size(sizeof(PLAINTEXT), &encrypteddatasize);
 
   uint8_t encrypteddata[encrypteddatasize];
   simple_xcypher_encrypt(PLAINTEXT, sizeof(PLAINTEXT), 0x123, encrypteddata, encrypteddatasize);
